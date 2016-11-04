@@ -1,4 +1,5 @@
 import sys
+import random
 import numpy    as np
 import pylab    as pl
 
@@ -154,7 +155,6 @@ def backprop(num_layers, output_error, theta, z):
   deltas = [output_error]
 
   for layer_index in reversed(range(1, num_layers-1)):
-    print "layer_index: ", layer_index
     # Building up list of deltas, so next delta (previously calculated) is at the 0th index
     next_delta = deltas[0]
     next_w = theta[2 * (layer_index - 1)]
@@ -183,16 +183,16 @@ def calculate_gradient(deltas, alphas, num_layers):
 def calculate_overall_gradient(x, y, theta):
   num_layers = len(theta) / 2
 
-  print "Feedforward..."
+  # print "Feedforward..."
   alphas, z = feedforward(x, theta, num_layers)
-  print "Calculating output error..."
+  # print "Calculating output error..."
   output_error = calculate_output_error(y, z, alphas)
-  print "Backprop..."
+  # print "Backprop..."
   deltas = backprop(num_layers, output_error, theta, z)
-  print "Calculating gradient..."
+  # print "Calculating gradient..."
   gradient = calculate_gradient(deltas, alphas, num_layers)
 
-  return gradient
+  return gradient, output_error
 
 ##### SGD #####
 
@@ -200,27 +200,30 @@ def calculate_next_theta(old_theta, x, y, t):
   t0 = 10**6
   k = 0.75
   n = lambda t: (t0 + t)**(-k)
-  gradient = calculate_overall_gradient(x, y, old_theta)
+  gradient, output_error = calculate_overall_gradient(x, y, old_theta)
 
   new_theta = []
   for old_elem, gradient_elem in zip(old_theta, gradient):
     step = np.dot(n(t), gradient_elem)
     new_theta.append(old_elem - step)
 
-  return new_theta
+  return new_theta, output_error
 
 
-def sgd(x, y, theta):  #, objective_f, threshold):
+def sgd(x, y, theta, threshold):  #, objective_f, threshold):
   number_of_samples = len(x)
 
   differences = [False] * number_of_samples
   old_jthetas = [0.0] * number_of_samples
   previous_values = []
+  within_threshold = False
   t = 0
 
-  while t < 10 and not all(differences):
+  while not within_threshold: # > threshold:  # t < 10 and not all(differences):
+    print "t: ", t
     i = t % number_of_samples
-    theta = calculate_next_theta(theta, x[i], y[i], t)
+    theta, output_error = calculate_next_theta(theta, x[i], y[i], t)
+    print "theta: ", theta, "  output_error: ", output_error
     # new_jtheta = objective_f(x[i], y[i], theta)
     # difference = new_jtheta - old_jthetas[i]
 
@@ -230,6 +233,8 @@ def sgd(x, y, theta):  #, objective_f, threshold):
     previous_values.append(theta)
     # previous_values.append((theta, new_jtheta))
     # old_jthetas[i] = new_jtheta
+
+    within_threshold = all([abs(elem) < threshold for elem in output_error])
 
     t += 1
 
@@ -249,14 +254,16 @@ def get_data(filename):
 if __name__ == '__main__':
   filename = "../data/data_3class.csv"
   x, y = get_data(filename)
+  # x, y = [[1,2], [2,3]], [0,1]
+
   neurons_per_layer = 5
+  threshold = 0.05
 
 
-  W_1 = np.array([[1.]*neurons_per_layer]*len(x[0]))
+  W_1 = np.array([[random.randint(0,9) / 10.]*neurons_per_layer]*len(x[0]))
   b_1 = np.array([1.]*neurons_per_layer)
   theta = [W_1, b_1]
 
-  print sgd(x, y, theta)
-
+  previous_values = sgd(x, y, theta, threshold)
 
 
