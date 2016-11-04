@@ -153,10 +153,6 @@ def calculate_output_error(y, z, alphas):
 def backprop(num_layers, output_error, theta, z):
   deltas = [output_error]
 
-  print "output_error: ", output_error
-  print "theta: ", theta
-  print "z: ", z
-
   for layer_index in reversed(range(1, num_layers-1)):
     print "layer_index: ", layer_index
     # Building up list of deltas, so next delta (previously calculated) is at the 0th index
@@ -164,8 +160,6 @@ def backprop(num_layers, output_error, theta, z):
     next_w = theta[2 * (layer_index - 1)]
 
     derivative = relu_derivative_fn(z[layer_index])
-    print "derivative: ", derivative, "  w: ", next_w, "  next_delta: ", next_delta
-    print "diag: ", np.diag(derivative)
 
     delta = np.dot(np.diag(derivative), np.dot(next_w, next_delta))
     deltas.insert(0, delta)
@@ -178,7 +172,7 @@ def calculate_gradient(deltas, alphas, num_layers):
 
   for layer_index in range(num_layers):
     # Alphas starts with a_0, deltas starts with delta_1
-    weight_gradient = np.dot(alphas[layer_index], np.transpose(deltas[layer_index]))
+    weight_gradient = np.dot(np.transpose([alphas[layer_index]]), [deltas[layer_index]])
     bias_gradient = deltas[layer_index]
 
     gradient.append(weight_gradient)
@@ -208,9 +202,12 @@ def calculate_next_theta(old_theta, x, y, t):
   n = lambda t: (t0 + t)**(-k)
   gradient = calculate_overall_gradient(x, y, old_theta)
 
-  print "gradient: ", gradient
-  print np.dot(n(t), gradient)
-  return old_theta - (n(t) * gradient)
+  new_theta = []
+  for old_elem, gradient_elem in zip(old_theta, gradient):
+    step = np.dot(n(t), gradient_elem)
+    new_theta.append(old_elem - step)
+
+  return new_theta
 
 
 def sgd(x, y, theta):  #, objective_f, threshold):
@@ -230,8 +227,9 @@ def sgd(x, y, theta):  #, objective_f, threshold):
     # if(abs(difference) < threshold):
     #   differences[i] = True
 
-    previous_values.append((theta, new_jtheta))
-    old_jthetas[i] = new_jtheta
+    previous_values.append(theta)
+    # previous_values.append((theta, new_jtheta))
+    # old_jthetas[i] = new_jtheta
 
     t += 1
 
