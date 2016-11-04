@@ -1,19 +1,48 @@
 import sys
-sys.path.append('../../../hw1/code/P1')
-from sgd        import sgd
 import numpy    as np
+import pylab    as pl
 
+##### Softmax functions #####
 def softmax_fn(z):
   output = []
   denominator_sum = 0.
   for z_j in z:
-    denominator_sum += np.e(z_j)
+    denominator_sum += np.exp(z_j)
 
   for z_i in z:
-    output.append(np.e(z_i) / denominator_sum)
+    output.append(np.exp(z_i) / denominator_sum)
   return output
 
 
+def softmax_derivative_fn(z, f_index, derivative_index):
+  ez_sum = 0.
+
+  for z_i in z:
+    ez_sum += np.exp(z_i)
+  denominator = ez_sum ** 2.
+
+  if derivative_index == f_index:
+    numerator = np.exp(z[derivative_index]) * (ez_sum - np.exp(z[derivative_index]))
+  else:
+    numerator = np.exp(z[derivative_index]) * np.exp(z[f_index])
+
+  return numerator / denominator
+
+
+def softmax_gradient_matrix(z):
+  array = []
+
+  for i in range(len(z)):
+    subarray = []
+    for j in range(len(z)):
+      gradient = softmax_derivative_fn(z, i, j)
+      subarray.append(gradient)
+    array.append(subarray)
+
+  return np.array(array)
+
+
+##### ReLu functions #####
 def relu_fn(z):
   output = []
   for z_i in z:
@@ -21,60 +50,73 @@ def relu_fn(z):
   return output
 
 
-def loss_gradient_fn(x, y, z, w):
-  df_dz = 0
-  if z > 0:
-    df_dz = 1
+def relu_derivative_fn(z):
+  derivative = []
 
-  dl_dz = 0
-  if cross_entropy_loss(y, z, softmax_fn) > 0:
-    dl_dz = -y
+  for z_i in z:
+    if z_i > 0:
+      derivative.append(1)
+    else:
+      derivative.append(0)
 
-  return x * df_dz * w * dl_dz
-
-
-def calculate_z(x, w, b):
-  z_sum = 0
-  for x_i, w_i in zip(x, w):
-    z_sum += float(x_i) * w_i
-  return z_sum + b
+  return derivative
 
 
-def cross_entropy_loss(x, y, fn):
-  all_z = []
+# def loss_gradient_fn(x, y, z, w):
+#   df_dz = 0
+#   if z > 0:
+#     df_dz = 1
 
-  loss_sum = 0
-  for x_i, y_i in zip(x, y):
-    z_i = calculate_z(x_i, w, b)
-    log = np.log(fn(z_i, all_z))
-    loss_sum += y_i * log
+#   dl_dz = 0
+#   if cross_entropy_loss(y, z, softmax_fn) > 0:
+#     dl_dz = -y
 
-  return -loss_sum
-
-def calculate_node_output():
+#   return x * df_dz * w * dl_dz
 
 
-def train_neural_net(inputs, num_layers, num_nodes):
-  current_inputs = inputs
-  for layer_index in range(num_layers):
+# def calculate_z(x, w, b):
+#   z_sum = 0
+#   for x_i, w_i in zip(x, w):
+#     z_sum += float(x_i) * w_i
+#   return z_sum + b
 
-    for node_index in range(num_nodes):
-      node_output = calculate_node_output(current_inputs)
 
-    current_inputs = []
+# def cross_entropy_loss(x, y, fn):
+#   all_z = []
+
+#   loss_sum = 0
+#   for x_i, y_i in zip(x, y):
+#     z_i = calculate_z(x_i, w, b)
+#     log = np.log(fn(z_i, all_z))
+#     loss_sum += y_i * log
+
+#   return -loss_sum
+
+# def calculate_node_output():
+
+
+# def train_neural_net(inputs, num_layers, num_nodes):
+#   current_inputs = inputs
+#   for layer_index in range(num_layers):
+
+#     for node_index in range(num_nodes):
+#       node_output = calculate_node_output(current_inputs)
+
+#     current_inputs = []
 
 
 ############################################
 
+
 def feedforward(x, theta, num_layers):
   alphas = [x]
-  z = [0]
+  z = []
 
-  for layer_index in range(1, num_layers):
-    w_l = theta[2 * (layer_index - 1)]
-    b_l - theta[2 * (layer_index - 1) + 1]
+  for layer_index in range(num_layers):
+    w_l = theta[2 * (layer_index)]
+    b_l = theta[2 * (layer_index) + 1]
 
-    if layer_index < num_layers - 1:
+    if layer_index < num_layers:
       fn = relu_fn
     else:
       fn = softmax_fn
@@ -88,20 +130,42 @@ def feedforward(x, theta, num_layers):
 
   return alphas, z
 
-def calculate_output_error():
+
+def loss_gradient_matrix(y, alphas):
+  loss_gradient_array = []
+
+  for index in range(len(alphas)):
+    if int(y) == index:
+      loss_gradient_array.append(-y / alphas[index])
+    else:
+      loss_gradient_array.append(0)
+
+  return np.array(loss_gradient_array)
+
+
+def calculate_output_error(y, z, alphas):
+  loss_gradient = loss_gradient_matrix(y, alphas[-1])
+  softmax_matrix = softmax_gradient_matrix(z[-1])
+
+  return np.dot(loss_gradient, softmax_matrix)
 
 
 def backprop(num_layers, output_error, theta, z):
   deltas = [output_error]
 
-  for layer_index in reversed(range(num_layers-1, 1)):
-    next_delta = deltas[0]
-    next_w = theta[2 * layer_index]
+  print "output_error: ", output_error
+  print "theta: ", theta
+  print "z: ", z
 
-    if z[layer_index] > 0:
-      derivative = 1
-    else:
-      derivative = 0
+  for layer_index in reversed(range(1, num_layers-1)):
+    print "layer_index: ", layer_index
+    # Building up list of deltas, so next delta (previously calculated) is at the 0th index
+    next_delta = deltas[0]
+    next_w = theta[2 * (layer_index - 1)]
+
+    derivative = relu_derivative_fn(z[layer_index])
+    print "derivative: ", derivative, "  w: ", next_w, "  next_delta: ", next_delta
+    print "diag: ", np.diag(derivative)
 
     delta = np.dot(np.diag(derivative), np.dot(next_w, next_delta))
     deltas.insert(0, delta)
@@ -113,8 +177,8 @@ def calculate_gradient(deltas, alphas, num_layers):
   gradient = []
 
   for layer_index in range(num_layers):
-    ## TODO: why layer_index - 1? what does this mean for l = 0 or 1?
-    weight_gradient = np.dot(alpha[layer_index - 1], deltas[layer_index])
+    # Alphas starts with a_0, deltas starts with delta_1
+    weight_gradient = np.dot(alphas[layer_index], np.transpose(deltas[layer_index]))
     bias_gradient = deltas[layer_index]
 
     gradient.append(weight_gradient)
@@ -122,10 +186,79 @@ def calculate_gradient(deltas, alphas, num_layers):
 
   return gradient
 
-if __name__ == '__main__'
+def calculate_overall_gradient(x, y, theta):
+  num_layers = len(theta) / 2
+
+  print "Feedforward..."
+  alphas, z = feedforward(x, theta, num_layers)
+  print "Calculating output error..."
+  output_error = calculate_output_error(y, z, alphas)
+  print "Backprop..."
+  deltas = backprop(num_layers, output_error, theta, z)
+  print "Calculating gradient..."
+  gradient = calculate_gradient(deltas, alphas, num_layers)
+
+  return gradient
+
+##### SGD #####
+
+def calculate_next_theta(old_theta, x, y, t):
+  t0 = 10**6
+  k = 0.75
+  n = lambda t: (t0 + t)**(-k)
+  gradient = calculate_overall_gradient(x, y, old_theta)
+
+  print "gradient: ", gradient
+  print np.dot(n(t), gradient)
+  return old_theta - (n(t) * gradient)
 
 
+def sgd(x, y, theta):  #, objective_f, threshold):
+  number_of_samples = len(x)
 
+  differences = [False] * number_of_samples
+  old_jthetas = [0.0] * number_of_samples
+  previous_values = []
+  t = 0
+
+  while t < 10 and not all(differences):
+    i = t % number_of_samples
+    theta = calculate_next_theta(theta, x[i], y[i], t)
+    # new_jtheta = objective_f(x[i], y[i], theta)
+    # difference = new_jtheta - old_jthetas[i]
+
+    # if(abs(difference) < threshold):
+    #   differences[i] = True
+
+    previous_values.append((theta, new_jtheta))
+    old_jthetas[i] = new_jtheta
+
+    t += 1
+
+  return previous_values
+
+
+def get_data(filename):
+  data = pl.loadtxt(filename)
+  x, y = [], []
+
+  for line in data:
+    x.append(line[:2])
+    y.append(line[2])
+
+  return x, y
+
+if __name__ == '__main__':
+  filename = "../data/data_3class.csv"
+  x, y = get_data(filename)
+  neurons_per_layer = 5
+
+
+  W_1 = np.array([[1.]*neurons_per_layer]*len(x[0]))
+  b_1 = np.array([1.]*neurons_per_layer)
+  theta = [W_1, b_1]
+
+  print sgd(x, y, theta)
 
 
 
