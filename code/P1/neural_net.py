@@ -180,6 +180,7 @@ def calculate_gradient(deltas, alphas, num_layers):
 
   return gradient
 
+
 def calculate_overall_gradient(x, y, theta):
   num_layers = len(theta) / 2
 
@@ -256,13 +257,14 @@ if __name__ == '__main__':
   x, y = get_data(filename)
   # x, y = [[1,2], [2,3]], [0,1]
 
-  neurons_per_layer = 5
+  num_layers = 1
+  neurons_per_layer = 4
   threshold = 0.05
 
 
   W_1 = np.array([[random.randint(0,9) / 10.]*neurons_per_layer]*len(x[0]))
   b_1 = np.array([1.]*neurons_per_layer)
-  theta = [W_1, b_1]
+  theta = [W_1, b_1] * num_layers
 
   previous_values = sgd(x, y, theta, threshold)
 
