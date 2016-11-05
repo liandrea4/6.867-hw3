@@ -1,7 +1,9 @@
 import sys
 import random
-import numpy    as np
-import pylab    as pl
+import sklearn
+import numpy                   as np
+import pylab                   as pl
+from sklearn import neural_network
 
 ##### Softmax functions #####
 def softmax_fn(z):
@@ -12,7 +14,7 @@ def softmax_fn(z):
 
   for z_i in z:
     output.append(np.exp(z_i) / denominator_sum)
-  return output
+  return np.array(output)
 
 
 def softmax_derivative_fn(z, f_index, derivative_index):
@@ -48,7 +50,7 @@ def relu_fn(z):
   output = []
   for z_i in z:
     output.append(max(0., z_i))
-  return output
+  return np.array(output)
 
 
 def relu_derivative_fn(z):
@@ -60,7 +62,7 @@ def relu_derivative_fn(z):
     else:
       derivative.append(0)
 
-  return derivative
+  return np.array(derivative)
 
 
 # def loss_gradient_fn(x, y, z, w):
@@ -113,7 +115,7 @@ def feedforward(x, theta, num_layers):
   alphas = [x]
   z = []
 
-  for layer_index in range(num_layers):
+  for layer_index in range(num_layers+1):
     w_l = theta[2 * (layer_index)]
     b_l = theta[2 * (layer_index) + 1]
 
@@ -122,7 +124,7 @@ def feedforward(x, theta, num_layers):
     else:
       fn = softmax_fn
 
-    prev_alpha = alphas[layer_index - 1]
+    prev_alpha = alphas[layer_index]
     z_l = np.dot(np.transpose(w_l), prev_alpha) + b_l
     a_l = fn(z_l)
 
@@ -154,10 +156,10 @@ def calculate_output_error(y, z, alphas):
 def backprop(num_layers, output_error, theta, z):
   deltas = [output_error]
 
-  for layer_index in reversed(range(1, num_layers-1)):
+  for layer_index in reversed(range(num_layers)):
     # Building up list of deltas, so next delta (previously calculated) is at the 0th index
     next_delta = deltas[0]
-    next_w = theta[2 * (layer_index - 1)]
+    next_w = theta[2*(layer_index+1)]
 
     derivative = relu_derivative_fn(z[layer_index])
 
@@ -170,7 +172,7 @@ def backprop(num_layers, output_error, theta, z):
 def calculate_gradient(deltas, alphas, num_layers):
   gradient = []
 
-  for layer_index in range(num_layers):
+  for layer_index in range(num_layers+1):
     # Alphas starts with a_0, deltas starts with delta_1
     weight_gradient = np.dot(np.transpose([alphas[layer_index]]), [deltas[layer_index]])
     bias_gradient = deltas[layer_index]
@@ -181,9 +183,7 @@ def calculate_gradient(deltas, alphas, num_layers):
   return gradient
 
 
-def calculate_overall_gradient(x, y, theta):
-  num_layers = len(theta) / 2
-
+def calculate_overall_gradient(x, y, theta, num_layers):
   # print "Feedforward..."
   alphas, z = feedforward(x, theta, num_layers)
   # print "Calculating output error..."
@@ -192,38 +192,39 @@ def calculate_overall_gradient(x, y, theta):
   deltas = backprop(num_layers, output_error, theta, z)
   # print "Calculating gradient..."
   gradient = calculate_gradient(deltas, alphas, num_layers)
-
   return gradient, output_error
 
 ##### SGD #####
 
-def calculate_next_theta(old_theta, x, y, t):
-  t0 = 10**6
+def calculate_next_theta(old_theta, x, y, t, num_layers):
+  t0 = 10
   k = 0.75
   n = lambda t: (t0 + t)**(-k)
-  gradient, output_error = calculate_overall_gradient(x, y, old_theta)
+  print "t: ", t, "  n: ", n(t)
+  gradient, output_error = calculate_overall_gradient(x, y, old_theta, num_layers)
+  print "gradient: ", gradient
 
   new_theta = []
   for old_elem, gradient_elem in zip(old_theta, gradient):
     step = np.dot(n(t), gradient_elem)
+    print "step: ", step
     new_theta.append(old_elem - step)
 
   return new_theta, output_error
 
 
-def sgd(x, y, theta, threshold):  #, objective_f, threshold):
+def sgd(x, y, theta, threshold, num_layers):
   number_of_samples = len(x)
 
-  differences = [False] * number_of_samples
-  old_jthetas = [0.0] * number_of_samples
+  # differences = [False] * number_of_samples
+  # old_jthetas = [0.0] * number_of_samples
   previous_values = []
   within_threshold = False
   t = 0
 
   while not within_threshold: # > threshold:  # t < 10 and not all(differences):
-    print "t: ", t
     i = t % number_of_samples
-    theta, output_error = calculate_next_theta(theta, x[i], y[i], t)
+    theta, output_error = calculate_next_theta(theta, x[i], y[i], t, num_layers)
     print "theta: ", theta, "  output_error: ", output_error
     # new_jtheta = objective_f(x[i], y[i], theta)
     # difference = new_jtheta - old_jthetas[i]
@@ -241,6 +242,35 @@ def sgd(x, y, theta, threshold):  #, objective_f, threshold):
 
   return previous_values
 
+##### Predictions and testing #####
+
+def predict(x, theta, num_layers):
+  prev_alphas = x
+
+  for layer_index in range(num_layers+1):
+    w_l = theta[2 * layer_index]
+    b_l = theta[2 * layer_index + 1]
+
+    if layer_index < num_layers:
+      fn = relu_fn
+    else:
+      fn = softmax_fn
+
+    z = np.dot(np.transpose(w_l), prev_alphas) + b_l
+    prev_alphas = fn(z)
+
+  return np.argmax(prev_alphas)
+
+def get_classification_accuracy(x, y, theta, num_layers):
+  num_classified_correctly = 0
+
+  for x_i, y_i in zip(x, y):
+    prediction = predict(x_i, theta, num_layers)
+    if int(y_i) == prediction:
+      num_classified_correctly += 1
+
+  return float(num_classified_correctly) / len(x)
+
 
 def get_data(filename):
   data = pl.loadtxt(filename)
@@ -252,20 +282,44 @@ def get_data(filename):
 
   return x, y
 
+def initialize_to_random(num):
+  return [ random.uniform(0, 1) for i in range(num) ]
+
+
+##### MAIN #####
+
 if __name__ == '__main__':
   filename = "../data/data_3class.csv"
   x, y = get_data(filename)
-  # x, y = [[1,2], [2,3]], [0,1]
+  size_of_training = 720
+  x_training, y_training = x[:size_of_training], y[:size_of_training]
+  x_validate, y_validate = x[size_of_training:], y[size_of_training:]
+  # x_training, y_training = [[1,2], [2,3]], [0,1]
 
   num_layers = 1
-  neurons_per_layer = 4
-  threshold = 0.05
+  neurons_per_layer = 9
+  threshold = 0.001
 
+  class_set = set(y)
+  num_classes = len(class_set)
 
-  W_1 = np.array([[random.randint(0,9) / 10.]*neurons_per_layer]*len(x[0]))
-  b_1 = np.array([1.]*neurons_per_layer)
-  theta = [W_1, b_1] * num_layers
+  W = np.array([ initialize_to_random(neurons_per_layer) for i in range(len(x[0])) ])
+  b = np.array(initialize_to_random(neurons_per_layer))
+  W_out = np.array([ initialize_to_random(num_classes) for i in range(neurons_per_layer) ])
+  b_out = np.array(initialize_to_random(num_classes))
+  theta = [W, b] * num_layers + [W_out, b_out]
 
-  previous_values = sgd(x, y, theta, threshold)
+  previous_values = sgd(x_training, y_training, theta, threshold, num_layers)
+  opt_theta = previous_values[-1]
+
+  classification_accuracy = get_classification_accuracy(x_validate, y_validate, theta, num_layers)
+  print "validation accuracy: ", classification_accuracy
+  classification_accuracy = get_classification_accuracy(x_validate, y_validate, opt_theta, num_layers)
+  print "validation accuracy: ", classification_accuracy
+
+  classifier = neural_network.MLPClassifier((50,), max_iter=500, early_stopping=True, solver='sgd', verbose=True, alpha=0)
+  classifier.fit(x_training, y_training)
+  print "params: ", classifier.coefs_
+
 
 
