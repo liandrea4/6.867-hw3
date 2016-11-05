@@ -80,7 +80,7 @@ In this section, we explore logistic regression with L1 and L2 regularization. W
 
 
 \subsection{Initialization}
-This is a reasonable choice because $m$ represents the number of neurons in each of our layers, which is what should control the variance of the distribution. The reason we do this is to ensure that the random input to a unit in a layer is agnostic to the number of inputs it receives.
+This is a reasonable choice because $m$ represents the number of input neurons in each of our layers, which is what should control the variance of the distribution. The reason we do this is to ensure that the random input to a unit in a layer is agnostic to the number of inputs it receives.
 
 \subsection{Regularization}
 This would impact the pseudocode because now we must also incorporate this additional regularization term when taking the gradient of the loss function. Since this gradient is used in the stochastic gradient descent update it ultimately impacts the entire algorithm. 
