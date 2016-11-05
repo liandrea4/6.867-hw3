@@ -64,50 +64,6 @@ def relu_derivative_fn(z):
 
   return np.array(derivative)
 
-
-# def loss_gradient_fn(x, y, z, w):
-#   df_dz = 0
-#   if z > 0:
-#     df_dz = 1
-
-#   dl_dz = 0
-#   if cross_entropy_loss(y, z, softmax_fn) > 0:
-#     dl_dz = -y
-
-#   return x * df_dz * w * dl_dz
-
-
-# def calculate_z(x, w, b):
-#   z_sum = 0
-#   for x_i, w_i in zip(x, w):
-#     z_sum += float(x_i) * w_i
-#   return z_sum + b
-
-
-# def cross_entropy_loss(x, y, fn):
-#   all_z = []
-
-#   loss_sum = 0
-#   for x_i, y_i in zip(x, y):
-#     z_i = calculate_z(x_i, w, b)
-#     log = np.log(fn(z_i, all_z))
-#     loss_sum += y_i * log
-
-#   return -loss_sum
-
-# def calculate_node_output():
-
-
-# def train_neural_net(inputs, num_layers, num_nodes):
-#   current_inputs = inputs
-#   for layer_index in range(num_layers):
-
-#     for node_index in range(num_nodes):
-#       node_output = calculate_node_output(current_inputs)
-
-#     current_inputs = []
-
-
 ############################################
 
 
@@ -282,6 +238,42 @@ def get_data(filename):
 
   return x, y
 
+def load_hw2_data(filenum):
+  train = np.loadtxt('../hw2_data/data'+filenum+'_train.csv')
+  x_training = train[:,0:2]
+  y_training = train[:,2:3]
+
+  validate = np.loadtxt('../hw2_data/data'+filenum+'_validate.csv')
+  x_validate = validate[:,0:2]
+  y_validate = validate[:,2:3]
+
+  test = np.loadtxt('../hw2_data/data'+filenum+'_test.csv')
+  x_testing = test[:,0:2]
+  y_testing = test[:,2:3]
+
+  x_training_validate, y_training_validate = [], []
+  for data_x, data_y in zip(x_training, y_training):
+    x_training_validate.append(data_x)
+    y_training_validate.append(data_y)
+  for data_x, data_y in zip(x_validate, y_validate):
+    x_training_validate.append(data_x)
+    y_training_validate.append(data_y)
+
+  y_adjusted_training_validate = []
+  for elem in y_training_validate:
+    if elem < 0:
+      y_adjusted_training_validate.append(0)
+    else:
+      y_adjusted_training_validate.append(1)
+  y_adjusted_testing = []
+  for elem in y_testing:
+    if elem < 0:
+      y_adjusted_testing.append(0)
+    else:
+      y_adjusted_testing.append(1)
+
+  return x_training, y_training, x_training_validate, y_adjusted_training_validate, x_testing, y_adjusted_testing
+
 def initialize_to_random(num):
   return [ random.uniform(0, 1) for i in range(num) ]
 
@@ -289,38 +281,44 @@ def initialize_to_random(num):
 ##### MAIN #####
 
 if __name__ == '__main__':
-  filename = "../data/data_3class.csv"
-  x, y = get_data(filename)
-  size_of_training = 720
-  x_training, y_training = x[:size_of_training], y[:size_of_training]
-  x_validate, y_validate = x[size_of_training:], y[size_of_training:]
+  filenum = sys.argv[1]
+  # filename = "../data/data_3class.csv"
+  # x, y = get_data(filename)
+  # size_of_training = 720
+  # x_training, y_training = x[:size_of_training], y[:size_of_training]
+  # x_validate, y_validate = x[size_of_training:], y[size_of_training:]
   # x_training, y_training = [[1,2], [2,3]], [0,1]
+
+  x_training, y_training, x_training_validate, y_training_validate, x_testing, y_testing = load_hw2_data(filenum)
+
 
   num_layers = 1
   neurons_per_layer = 5
   threshold = 0.001
 
-  class_set = set(y)
-  num_classes = len(class_set)
+  # class_set = set(y)
+  # num_classes = len(class_set)
 
-  W = np.array([ initialize_to_random(neurons_per_layer) for i in range(len(x[0])) ])
-  b = np.array(initialize_to_random(neurons_per_layer))
-  W_out = np.array([ initialize_to_random(num_classes) for i in range(neurons_per_layer) ])
-  b_out = np.array(initialize_to_random(num_classes))
-  theta = [W, b] * num_layers + [W_out, b_out]
-  print "theta: ", theta
+  # W = np.array([ initialize_to_random(neurons_per_layer) for i in range(len(x[0])) ])
+  # b = np.array(initialize_to_random(neurons_per_layer))
+  # W_out = np.array([ initialize_to_random(num_classes) for i in range(neurons_per_layer) ])
+  # b_out = np.array(initialize_to_random(num_classes))
+  # theta = [W, b] * num_layers + [W_out, b_out]
+  # print "theta: ", theta
 
-  previous_values = sgd(x_training, y_training, theta, threshold, num_layers)
-  opt_theta = previous_values[-1]
+  # previous_values = sgd(x_training, y_training, theta, threshold, num_layers)
+  # opt_theta = previous_values[-1]
 
-  classification_accuracy = get_classification_accuracy(x_validate, y_validate, theta, num_layers)
-  print "validation accuracy: ", classification_accuracy
-  classification_accuracy = get_classification_accuracy(x_validate, y_validate, opt_theta, num_layers)
-  print "validation accuracy: ", classification_accuracy
+  # classification_accuracy = get_classification_accuracy(x_validate, y_validate, theta, num_layers)
+  # print "validation accuracy: ", classification_accuracy
+  # classification_accuracy = get_classification_accuracy(x_validate, y_validate, opt_theta, num_layers)
+  # print "validation accuracy: ", classification_accuracy
 
-  classifier = neural_network.MLPClassifier((5,10), max_iter=500, early_stopping=True, solver='sgd', verbose=True, alpha=0)
-  classifier.fit(x_training, y_training)
+  classifier = neural_network.MLPClassifier((5,5), max_iter=500, early_stopping=True, solver='sgd', verbose=True, alpha=0, validation_fraction=1./3)
+  classifier.fit(x_training_validate, y_training_validate)
   print "params: ", classifier.coefs_
+  print "training score: ", classifier.score(x_training_validate, y_training_validate)
+  print "testing score: ", classifier.score(x_testing, y_testing)
 
 
 

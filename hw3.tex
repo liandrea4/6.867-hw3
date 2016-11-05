@@ -86,12 +86,42 @@ $$-\sum_{i=1}^k y_i \log(f(z)_i)$$
 This formulation of the loss function is essentially a calculation of our confidence in the correct classification. In other words, the loss is the log likelihood of the correctly classified class by the weights assigned in our training of the neural network model. This loss is incorporated into the implementation via the output error. This output error is then involved in backpropagation to determine $\delta$ values for each layer in the neural network, which is subsequently used to calculate the gradient used for stochastic gradient descent. Thus, our choice of the Softmax function as the output activation function and the cross entropy loss as the loss function in this case is critically important in our overall implementation. Different choices of these functions could fundamentally change the training and thus classification accuracy of our overall model.
 
 \subsection{Initialization}
-This is a reasonable choice because $m$ represents the number of input neurons in each of our layers, which is what should control the variance of the distribution. The reason we do this is to ensure that the random input to a unit in a layer is agnostic to the number of inputs it receives.
+We can initialize the weights to be randomly selected from a Gaussian distribution with zero mean and standard deviation $\frac{1}{\sqrt{m}}$ for an $m$x$n$ weight matrix. Choosing to intiialize weights to these values is a reasonable decision because $m$ represents the number of input neurons in each of our layers. This is selected to control the variance of the distribution in order to ensure that each layer in the neural network is agnostic to the number of inputs it receives, and instead depends on the values of the inputs.
 
 \subsection{Regularization}
 This would impact the pseudocode because now we must also incorporate this additional regularization term when taking the gradient of the loss function. Since this gradient is used in the stochastic gradient descent update it ultimately impacts the entire algorithm.
 
 \subsection{Binary classification}
+We test our implementation on the 2D datasets provided in HW2. The accuracies for the training and testing data sets are presented for different architectures of the neural network in Tables 1 and 2. It is important to note that the accuracies varied significantly between multiple runs of the algorithm. This is because of the randomly initialized weights, so the accuracies presented are some examples of the results of our algorithm, but may reflect slight variation due to the random initializaation.
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{ | c | c | c | c | c | }
+      \hline
+          & $l=1, n=5$ & $l=1, n=100$ & $l=2, n=5$ & $l=2, n=100$ \\ \hline
+      1       & 0.718      & 0.997        & 0.75       & 0.995        \\ \hline
+      2       & 0.503      & 0.782        & 0.805      & 0.825        \\ \hline
+      3       & 0.512      & 0.953        & 0.885      & 0.94         \\ \hline
+      4       & 0.5        & 0.944        & 0.676      & 0.94         \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{Training accuracy, $l$ layers, $n$ neurons/layer}
+\end{table}
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{ | c | c | c | c | c | }
+      \hline
+          & $l=1, n=5$ & $l=1, n=100$ & $l=2, n=5$ & $l=2, n=100$ \\ \hline
+      1       & 0.71       & 0.99         & 0.74       & 0.995        \\ \hline
+      2       & 0.49       & 0.785        & 0.805      & 0.815        \\ \hline
+      3       & 0.48       & 0.945        & 0.89       & 0.955        \\ \hline
+      4       & 0.5        & 0.945        & 0.683      & 0.938 \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{Testing accuracy, $l$ layers, $n$ neurons/layer}
+\end{table}
+
 
 
 \subsection{Multi-class classification}
