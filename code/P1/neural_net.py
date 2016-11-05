@@ -297,7 +297,7 @@ if __name__ == '__main__':
   # x_training, y_training = [[1,2], [2,3]], [0,1]
 
   num_layers = 1
-  neurons_per_layer = 9
+  neurons_per_layer = 5
   threshold = 0.001
 
   class_set = set(y)
