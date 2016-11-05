@@ -74,16 +74,22 @@
 ]
 
 \section{Neural Networks}
-In this section, we explore logistic regression with L1 and L2 regularization. We use gradient descent to compare the resulting weight vectors under different regularizers and regularization parameters, and we evaluate the effect of these choices in the context of multiple data sets.
+In this section, we explore neural networks and various choices for the number of hidden layers, the number of neurons per hidden layer, regularization, binary classification, and multiclass classification. We investigate how our choice of these variables impacts the overall classification rates and how these decisions are incorporated into our implementation of neural networks.
 
 \subsection{ReLU + Softmax}
+We have here implemented a neural network in which all the hidden units have a ReLu activation function and the final output layer has a Softmax activation function. This is incorporated into the implementation where in the output layer, the activation $\alpha_i$ for class $i$ is determined by the Softmax function:
+$$f(z)_i = \frac{e^{z_i}}{\sum_{j=1}^k e^{z_j}}$$
+Thus, for a $k$-class classification problem, the output layer has $k$ neurons each with Softmax activation. The prediction is therefore given by the argmax of the $alpha$ values calculated by the Softmax for each of the $k$ neurons. \\
 
+The cross entropy loss is the loss function used here and is given by:
+$$-\sum_{i=1}^k y_i \log(f(z)_i)$$
+This formulation of the loss function is essentially a calculation of our confidence in the correct classification. In other words, the loss is the log likelihood of the correctly classified class by the weights assigned in our training of the neural network model. This loss is incorporated into the implementation via the output error. This output error is then involved in backpropagation to determine $\delta$ values for each layer in the neural network, which is subsequently used to calculate the gradient used for stochastic gradient descent. Thus, our choice of the Softmax function as the output activation function and the cross entropy loss as the loss function in this case is critically important in our overall implementation. Different choices of these functions could fundamentally change the training and thus classification accuracy of our overall model.
 
 \subsection{Initialization}
 This is a reasonable choice because $m$ represents the number of neurons in each of our layers, which is what should control the variance of the distribution. The reason we do this is to ensure that the random input to a unit in a layer is agnostic to the number of inputs it receives.
 
 \subsection{Regularization}
-This would impact the pseudocode because now we must also incorporate this additional regularization term when taking the gradient of the loss function. Since this gradient is used in the stochastic gradient descent update it ultimately impacts the entire algorithm. 
+This would impact the pseudocode because now we must also incorporate this additional regularization term when taking the gradient of the loss function. Since this gradient is used in the stochastic gradient descent update it ultimately impacts the entire algorithm.
 
 \subsection{Binary classification}
 

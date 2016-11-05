@@ -308,6 +308,7 @@ if __name__ == '__main__':
   W_out = np.array([ initialize_to_random(num_classes) for i in range(neurons_per_layer) ])
   b_out = np.array(initialize_to_random(num_classes))
   theta = [W, b] * num_layers + [W_out, b_out]
+  print "theta: ", theta
 
   previous_values = sgd(x_training, y_training, theta, threshold, num_layers)
   opt_theta = previous_values[-1]
@@ -317,7 +318,7 @@ if __name__ == '__main__':
   classification_accuracy = get_classification_accuracy(x_validate, y_validate, opt_theta, num_layers)
   print "validation accuracy: ", classification_accuracy
 
-  classifier = neural_network.MLPClassifier((50,), max_iter=500, early_stopping=True, solver='sgd', verbose=True, alpha=0)
+  classifier = neural_network.MLPClassifier((5,10), max_iter=500, early_stopping=True, solver='sgd', verbose=True, alpha=0)
   classifier.fit(x_training, y_training)
   print "params: ", classifier.coefs_
 
