@@ -50,7 +50,7 @@ for learning_rate in learning_rates:
   total_testing_score = 0
 
   for i in range(num_repeats):
-    classifier = neural_network.MLPClassifier((100,100), max_iter=500, early_stopping=True, solver='sgd', alpha=0, learning_rate_init=learning_rate, validation_fraction=4./7)
+    classifier = neural_network.MLPClassifier((1000,1000,1000), max_iter=500, early_stopping=True, solver='sgd', alpha=0, learning_rate_init=learning_rate, validation_fraction=4./7)
     classifier.fit(x_training_validate, y_training_validate)
     total_testing_score += classifier.score(x_testing, y_testing)
     total_training_score += classifier.score(x_training_validate, y_training_validate)
@@ -63,7 +63,7 @@ print "plotting..."
 plt.figure()
 plt.plot(learning_rates, testing_rates_list)
 plt.xscale('log')
-plt.title('Testing accuracy vs. learning rate, n=100, l=2', fontsize=16)
+plt.title('Testing accuracy vs. learning rate, n=1000, l=3', fontsize=16)
 plt.xlabel('Learning rate', fontsize=14)
 plt.ylabel('Testing accuracy', fontsize=14)
 plt.show()

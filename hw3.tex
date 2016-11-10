@@ -175,7 +175,7 @@ Figure 2 illustrates the testing accuracy rate as a function of the number of ne
   \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_neurons,mnist.png}
   \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_neurons,mnist,l2.png}
 \end{multicols}
-\caption{Learning rate vs. testing accuracy}
+\caption{Number of neurons vs. testing accuracy}
 \end{figure}
 
 We additionally explored the testing accuracy as a function of the number of layers in the neural network. These results are presented in Figure 3, in which the neural network had 5 neurons and 100 neurons per hidden layer. Both sizes of neural networks had similar trends, in that performance generally peaked at around 2 or 3 hidden layers. Performance generally deteriorated for smaller or larger values of $l$, which is in support of our hypothesis that extremely complex neural nets might overfit to the training data and thus suffer during testing on unseen data samples. Furthermore, as is consistent with our hypothesis, we can see that peak performance for the neural network with five neurons per layer performed worse (at around 12\%) than the neural network with 100 neurons per layer (at around 18\%).
@@ -186,7 +186,7 @@ We additionally explored the testing accuracy as a function of the number of lay
   \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_layers,mnist,n5.png}
   \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_layers,mnist,n100.png}
 \end{multicols}
-\caption{Learning rate vs. testing accuracy}
+\caption{Number of layers vs. testing accuracy}
 \end{figure}
 
 Figure 4 illustrates the relationship between the learning rate and the testing accuracy for neural networks of size $n=5,l=2$ and $n=100,l=1$. In this situation, we again found that there was an optimal learning rate, below and above which the performance of the neural network significantly suffered. Interestingly however, we found that the optimal learning rate for a neural network with $n=5, l=2$ was generally much smaller for the multi-class classification problem with MNIST ($\eta^*$ = 1\textsc{e}-5) than with the binary classification problem ($\eta^*$ = 1\textsc{e}-2). We did not observe this discrepancy in behavior comparing a neural network with $n=100, l=1$ in the multi-class classification problem versus in the binary classification problem ($\eta^*$ = 1\textsc{e}-2 for both).
@@ -198,6 +198,16 @@ Figure 4 illustrates the relationship between the learning rate and the testing 
   \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_learning_rate,mnist,(100).png}
 \end{multicols}
 \caption{Learning rate vs. testing accuracy}
+\end{figure}
+
+Note that in this case, normalization of the data is especially important. This is because of the activation function we have chosen to use in each of the neurons of the hidden layers. More specifically, the ReLu activation function takes the maximum of 0 and $z$. For unnormalized data however, $z > 0$, and this activation function would not adequately fit the architecture of the neural network. Normalization is therefore essential in order to have the data input fit the architecture demanded by a neural network.
+
+Overall we found that for the multi-class classification problem explored here, a neural network with 3 hidden layers and a large number of neurons per hidden layer (e.g. 1000) with an optimized learning rate performs best. We found that under this architecture, the optimal learning rate was $\eta^*=$1\textsc{E}-2 with a final testing performance of 39\% (Figure 4).
+
+\begin{figure}[width=\linewidth]
+\centering
+  \includegraphics[width=0.8\linewidth]{code/P1/accuracy_vs_learning_rate,mnist,(1000,1000,1000).png}
+\caption{Best neural network architecture}
 \end{figure}
 
 

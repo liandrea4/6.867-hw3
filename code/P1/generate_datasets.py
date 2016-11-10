@@ -44,8 +44,8 @@ def normalize_datasets(all_datasets):
       normalized_number_datasets = []
 
       for image in number_datasets:
-        # normalized_image = [ 2 * float(elem) / 255. - 1 for elem in image ]
-        normalized_image = [ float(elem) for elem in inmage ]
+        normalized_image = [ 2 * float(elem) / 255. - 1 for elem in image ]
+        # normalized_image = [ float(elem) for elem in inmage ]
         normalized_number_datasets.append(normalized_image)
 
       normalized_dict[key].append(normalized_number_datasets)
