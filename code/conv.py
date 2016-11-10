@@ -30,9 +30,9 @@ class ArtistConvNet:
 		batch_size = 10
 		learning_rate = 0.01
 		layer1_filter_size = 5
-		layer1_depth = 16
+		layer1_depth = 64
 		layer1_stride = 2
-		layer2_filter_size = 5
+		layer2_filter_size = 10
 		layer2_depth = 16
 		layer2_stride = 2
 		layer3_num_hidden = 64
@@ -48,7 +48,7 @@ class ArtistConvNet:
 
 		# Enable dropout and weight decay normalization
 		dropout_prob = 1.0 # set to < 1.0 to apply dropout, 1.0 to remove
-		weight_penalty = 0.0 # set to > 0.0 to apply weight penalty, 0.0 to remove
+		weight_penalty = 0.01 # set to > 0.0 to apply weight penalty, 0.0 to remove
 
 		with self.graph.as_default():
 			# Input data
