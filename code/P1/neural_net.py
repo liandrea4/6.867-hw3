@@ -3,6 +3,7 @@ import random
 import sklearn
 import numpy                   as np
 import pylab                   as pl
+import matplotlib.pyplot       as plt
 from sklearn import neural_network
 
 ##### Softmax functions #####
@@ -314,11 +315,39 @@ if __name__ == '__main__':
   # classification_accuracy = get_classification_accuracy(x_validate, y_validate, opt_theta, num_layers)
   # print "validation accuracy: ", classification_accuracy
 
-  classifier = neural_network.MLPClassifier((5,5), max_iter=500, early_stopping=True, solver='sgd', verbose=True, alpha=0, validation_fraction=1./3)
-  classifier.fit(x_training_validate, y_training_validate)
-  print "params: ", classifier.coefs_
-  print "training score: ", classifier.score(x_training_validate, y_training_validate)
-  print "testing score: ", classifier.score(x_testing, y_testing)
+  architectures = [(5), (100), (5,5), (100, 100)]
+  learning_rates = [100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001]
+  training_rates = {}
+  testing_rates = {}
+  num_repeats = 20
+  testing_rates_list = []
 
 
+  for learning_rate in learning_rates:
+    total_training_score = 0
+    total_testing_score = 0
+
+    for i in range(num_repeats):
+      classifier = neural_network.MLPClassifier((100), max_iter=500, early_stopping=True, solver='sgd', alpha=0, learning_rate_init=learning_rate, validation_fraction=1./3)
+      classifier.fit(x_training_validate, y_training_validate)
+      total_training_score += classifier.score(x_training_validate, y_training_validate)
+      total_testing_score += classifier.score(x_testing, y_testing)
+
+    testing_rates_list.append(total_testing_score / float(num_repeats))
+
+    # training_rates[learning_rate] = total_training_score / float(num_repeats)
+    # testing_rates[learning_rate] = total_testing_score / float(num_repeats)
+
+  # print "average training: ", training_rates
+  # print "average testing: ", testing_rates
+
+
+  print "plotting..."
+  plt.figure()
+  plt.plot(learning_rates, testing_rates_list)
+  plt.xscale('log')
+  plt.title('Testing accuracy vs. learning rate, (100)', fontsize=16)
+  plt.xlabel('Learning rate', fontsize=14)
+  plt.ylabel('Testing accuracy', fontsize=14)
+  plt.show()
 

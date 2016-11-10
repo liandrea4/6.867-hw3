@@ -86,31 +86,36 @@ $$-\sum_{i=1}^k y_i \log(f(z)_i)$$
 This formulation of the loss function is essentially a calculation of our confidence in the correct classification. In other words, the loss is the log likelihood of the correctly classified class by the weights assigned in our training of the neural network model. This loss is incorporated into the implementation via the output error. This output error is then involved in backpropagation to determine $\delta$ values for each layer in the neural network, which is subsequently used to calculate the gradient used for stochastic gradient descent. Thus, our choice of the Softmax function as the output activation function and the cross entropy loss as the loss function in this case is critically important in our overall implementation. Different choices of these functions could fundamentally change the training and thus classification accuracy of our overall model.
 
 \subsection{Initialization}
-We can initialize the weights to be randomly selected from a Gaussian distribution with zero mean and standard deviation $\frac{1}{\sqrt{m}}$ for an $m$x$n$ weight matrix. Choosing to intiialize weights to these values is a reasonable decision because $m$ represents the number of input neurons in each of our layers. This is selected to control the variance of the distribution in order to ensure that each layer in the neural network is agnostic to the number of inputs it receives, and instead depends on the values of the inputs.
+We can initialize the weights to be randomly selected from a Gaussian distribution with zero mean and standard deviation $\frac{1}{\sqrt{m}}$ for an $m$x$n$ weight matrix. Choosing to initialize weights to these values is a reasonable decision because $m$ represents the number of input neurons in each of our layers. This is selected to control the variance of the distribution in order to ensure that each layer in the neural network is agnostic to the number of inputs it receives, and instead depends on the values of the inputs.
 
 \subsection{Regularization}
-<<<<<<< HEAD
-This would impact the pseudocode because now we must also incorporate this additional regularization term when doing the stochastic gradient descent update. Specifically, the update step before regularization was:
-
+This would impact the pseudocode because now we must also incorporate this additional regularization term when taking the gradient of the loss function. Since this gradient is used in the stochastic gradient descent update it ultimately impacts the entire algorithm. More specifically, the update step before regularization was:
 $$\theta \leftarrow \theta - \eta \frac{\delta l(y,F(x;\theta))}{\delta \theta}$$
-
 With regularization, the update step now becomes:
 
-$\theta \leftarrow \theta - \eta \frac{\delta J}{\delta \theta}$ where $J(\theta) = L(\theta) + R(\theta)$ and $R(\theta) = \lambda *(\sum_{ij} w_{ij}^{(1)}^2 + \sum_{ij} w_{ij}^{(2)}^2)$. Furthermore, $J'(\theta) = L'(\theta) + R'(\theta)$. $L'(\theta)$ has already been calculated and $R'(\theta) = 2* \lambda * \sum_{ij} w_{ij}$
+$$\theta \leftarrow \theta - \eta \frac{\delta J}{\delta \theta}$$
+where
+$$J(\theta) = L(\theta) + R(\theta)$$
+and
+$$R(\theta) = \lambda *(\sum_{ij} {w_{ij}^{(1)}}^2 + \sum_{ij} {w_{ij}^{(2)}}^2)$$
+Furthermore,
+$$J'(\theta) = L'(\theta) + R'(\theta)$$
+$L'(\theta)$ has already been calculated and $R'(\theta)$ is given by:
+$$R'(\theta) = 2* \lambda * \sum_{ij} w_{ij}$$
 
 
 \subsection{Binary classification}
-We test our implementation on the 2D datasets provided in HW2. The accuracies for the training and testing data sets are presented for different architectures of the neural network in Tables 1 and 2. It is important to note that the accuracies varied significantly between multiple runs of the algorithm. This is because of the randomly initialized weights, so the accuracies presented are some examples of the results of our algorithm, but may reflect slight variation due to the random initializaation.
+We test our implementation on the 2D datasets provided in HW2. The accuracies for the training and testing data sets are presented for different architectures of the neural network in Tables 1 and 2. Interestingly, we found that our implementation of the neural network exhibited significant variability and instability, even for small networks. This could be attributed to the randomly initialized weights, as well as the fact that the algorithm terminates when the validation error no longer decreases. Other choices of the termination criterion would have affected the overall accuracy of the algorithm however. The numbers presented in Tables 1 and 2 therefore illustrate the average accuracies when each neural net training process was run 20 times with a learning rate of $0.1$.
 
 \begin{table}
   \begin{center}
     \begin{tabular}{ | c | c | c | c | c | }
       \hline
-          & $l=1, n=5$ & $l=1, n=100$ & $l=2, n=5$ & $l=2, n=100$ \\ \hline
-      1       & 0.718      & 0.997        & 0.75       & 0.995        \\ \hline
-      2       & 0.503      & 0.782        & 0.805      & 0.825        \\ \hline
-      3       & 0.512      & 0.953        & 0.885      & 0.94         \\ \hline
-      4       & 0.5        & 0.944        & 0.676      & 0.94         \\ \hline
+          & (5) & (100) & (5,5) & (100,100) \\ \hline
+      1   & 0.995      & 0.997        & 0.945      & 0.997        \\ \hline
+      2   & 0.819      & 0.835        & 0.785      & 0.840        \\ \hline
+      3   & 0.965      & 0.961        & 0.948      & 0.968        \\ \hline
+      4   & 0.934      & 0.951        & 0.919      & 0.951        \\ \hline
     \end{tabular}
   \end{center}
   \caption{Training accuracy, $l$ layers, $n$ neurons/layer}
@@ -120,15 +125,46 @@ We test our implementation on the 2D datasets provided in HW2. The accuracies fo
   \begin{center}
     \begin{tabular}{ | c | c | c | c | c | }
       \hline
-          & $l=1, n=5$ & $l=1, n=100$ & $l=2, n=5$ & $l=2, n=100$ \\ \hline
-      1       & 0.71       & 0.99         & 0.74       & 0.995        \\ \hline
-      2       & 0.49       & 0.785        & 0.805      & 0.815        \\ \hline
-      3       & 0.48       & 0.945        & 0.89       & 0.955        \\ \hline
-      4       & 0.5        & 0.945        & 0.683      & 0.938 \\ \hline
+          & (5)   & (100) & (5,5) & (100,100) \\ \hline
+      1   & 0.993      & 0.997        & 0.945      & 0.995        \\ \hline
+      2   & 0.799      & 0.813        & 0.768      & 0.823        \\ \hline
+      3   & 0.961      & 0.962        & 0.945      & 0.948        \\ \hline
+      4   & 0.942      & 0.956        & 0.925      & 0.958        \\ \hline
     \end{tabular}
   \end{center}
   \caption{Testing accuracy, $l$ layers, $n$ neurons/layer}
 \end{table}
+
+In general we found that the training and testing accuracies were fairly comparable with each other. Furthermore, the number of neurons and the number of layers did not significantly affect the accuracy rates, although the classification rate did suffer slightly in a smaller neural net (1 layer with 5 neuron per layer and 2 layers with 5 neurons per layer). The neural network consistently had the worst performance for dataset 2, which makes intuitive sense as dataset 2 was not linearly separable and had many overlapping samples of different classes.
+
+We additionally found that learning rate made a significant diference on the performance of the algorithm. This is plotted in Figure 1, in which the learning rates for different neural net architectures is compared with the average (over 20 runs as before) testing classification accuracy. It is interesting to note that the general shape of the curve plotting learning rate against testing accuracy is generally the same even for different architectures of the neural network. More specifically, accuracy peaks at a learning rate of about 0.1 to 1, and suffers quite significantly for greater and smaller learning rates. Furthermore, for suboptimal choices of the learning rate, the accuracy sometimes dropped below 50\%, at which point, the classifier effectively performs no better than random guess. In this case, these results were generated based on dataset 1, but similar results are fairly likely for other datasets.
+
+\begin{figure}[width=\linewidth]
+\centering
+\begin{multicols}{2}
+  \includegraphics[width=1.2\linewidth]{code/P1/learning_rate_vs_accuracy,(5,5).png}
+  \includegraphics[width=1.2\linewidth]{code/P1/learning_rate_vs_accuracy,(100).png}
+\end{multicols}
+\caption{Learning rate vs. testing accuracy}
+\end{figure}
+
+Comparing these results with the accuracies from HW2, we see that the neural network performed significantly better than logistic regression with various types of regularization for non-linearly separable data. For linearly separable data, the accuracies were very comparable. Comparing these results with support vector machines, the neural network performed approximately as well as an SVM with a linear kernel for all the datasets with the exception of dataset 4, which displayed very poor performance. For SVMs with a radial basis kernel however, we were able to improve on the performance of a linear kernel SVM for dataset 4, and overall, the radial basis SVM displayed comparable, if not slightly improved performance, over neural nets. This comparative analysis is illustrated in Table 3, where the neural net accuracies are generated based on a neural net of one layer with 100 neurons per layer.
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{ | c | c | c | c | c | }
+      \hline
+          & Logistic   & Linear SVM   & RBF SVM    & Neural net \\ \hline
+      1   & 0.99       & 0.99         & 0.99       & 0.997        \\ \hline
+      2   & 0.805      & 0.81         & 0.835      & 0.813        \\ \hline
+      3   & 0.97       & 0.97         & 0.96       & 0.962        \\ \hline
+      4   & 0.50       & 0.508        & 0.963      & 0.956        \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{Testing accuracies of different algorithms}
+\end{table}
+
+
 
 
 
