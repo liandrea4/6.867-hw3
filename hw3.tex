@@ -103,7 +103,7 @@ $L'(\theta)$ has already been calculated and $R'(\theta)$ is given by:
 $$R'(\theta) = 2* \lambda * \sum_{ij} w_{ij}$$
 
 \subsection{Binary classification}
-We test our implementation on the 2D datasets provided in HW2. The accuracies for the training and testing data sets are presented for different architectures of the neural network in Tables 1 and 2. Interestingly, we found that our implementation of the neural network exhibited significant variability and instability, even for small networks. This could be attributed to the randomly initialized weights, as well as the fact that the algorithm terminates when the validation error no longer decreases. Other choices of the termination criterion would have affected the overall accuracy of the algorithm however. The numbers presented in Tables 1 and 2 therefore illustrate the average accuracies when each neural net training process was run 20 times with a learning rate of $0.1$.
+We tested our implementation on the 2D datasets provided in HW2. The accuracies for the training and testing data sets are presented for different architectures of the neural network in Tables 1 and 2. Interestingly, we found that our implementation of the neural network exhibited significant variability and instability, even for small networks. This could be attributed to the randomly initialized weights, as well as the fact that the algorithm terminates when the validation error no longer decreases. Other choices of the termination criterion would have affected the overall accuracy of the algorithm however. The numbers presented in Tables 1 and 2 therefore illustrate the average accuracies when each neural net training process was run 20 times with a learning rate of $0.1$.
 
 \begin{table}
   \begin{center}
@@ -162,12 +162,41 @@ Comparing these results with the accuracies from HW2, we see that the neural net
   \caption{Testing accuracies of different algorithms}
 \end{table}
 
-
-
-
-
 \subsection{Multi-class classification}
+We ran our neural network on the multi-class classification problem of identifying digits from the MNIST dataset. In our analysis, we used the same training, validation, and testing dataset sizes as suggested in HW2 for consistency. In this multi-class classification problem, we found that performance in identifying numbers was quite surprisingly low (at a little better than random chance). Nonetheless, we compared the testing accuracy against different numbers of neurons per layer, different numbers of hidden layers, and different learning rates for different neural network architectures.
 
+Figure 2 illustrates the testing accuracy rate as a function of the number of neurons per layer in a one- and two-hidden layer neural network. It is interesting to note that in this case, accuracy increases as the number of neurons increases, which makes intuitive sense as an increased number of neurons can more effectively discover new features. Interestingly however, we do not observe a fall in the performance of the neural network at extremely large values of $n$, the number of neurons per layer (e.g. 1000), as one might expect could result due to overfitting. Here we simply see the performance of the network improve from a little better than random chance when $n=10$ to about 22\% when $n=1000$. The performance results for a one-layer neural network versus a two-layer neural network were found to be very comparable. Note that the accuracies calculated here are again an average of 20 runs of training.
+
+\begin{figure}[width=\linewidth]
+\centering
+\begin{multicols}{2}
+  \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_neurons,mnist.png}
+  \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_neurons,mnist,l2.png}
+\end{multicols}
+\caption{Learning rate vs. testing accuracy}
+\end{figure}
+
+We additionally explored the testing accuracy as a function of the number of layers in the neural network. These results are presented in Figure 3, in which the neural network had 5 neurons and 100 neurons per hidden layer. Both sizes of neural networks had similar trends, in that performance generally peaked at around 2 or 3 hidden layers. Performance generally deteriorated for smaller or larger values of $l$, which is in support of our hypothesis that extremely complex neural nets might overfit to the training data and thus suffer during testing on unseen data samples. Furthermore, as is consistent with our hypothesis, we can see that peak performance for the neural network with five neurons per layer performed worse (at around 12\%) than the neural network with 100 neurons per layer (at around 18\%).
+
+\begin{figure}[width=\linewidth]
+\centering
+\begin{multicols}{2}
+  \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_layers,mnist,n5.png}
+  \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_layers,mnist,n100.png}
+\end{multicols}
+\caption{Learning rate vs. testing accuracy}
+\end{figure}
+
+Figure 4 illustrates the relationship between the learning rate and the testing accuracy for neural networks of size $n=5,l=2$ and $n=100,l=1$. In this situation, we again found that there was an optimal learning rate, below and above which the performance of the neural network significantly suffered. Interestingly however, we found that the optimal learning rate for a neural network with $n=5, l=2$ was generally much smaller for the multi-class classification problem with MNIST ($\eta^*$ = 1\textsc{e}-5) than with the binary classification problem ($\eta^*$ = 1\textsc{e}-2). We did not observe this discrepancy in behavior comparing a neural network with $n=100, l=1$ in the multi-class classification problem versus in the binary classification problem ($\eta^*$ = 1\textsc{e}-2 for both).
+
+\begin{figure}[width=\linewidth]
+\centering
+\begin{multicols}{2}
+  \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_learning_rate,mnist,(5,5).png}
+  \includegraphics[width=1.2\linewidth]{code/P1/accuracy_vs_learning_rate,mnist,(100).png}
+\end{multicols}
+\caption{Learning rate vs. testing accuracy}
+\end{figure}
 
 
 \section{Convolutional Neural Networks}

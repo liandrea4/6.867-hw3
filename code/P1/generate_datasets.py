@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 num_training = 200
 num_validation = 150
 num_testing = 150
-filepath = "../data/mnist_digit_"
+filepath = "../hw2_data/mnist_digit_"
 
 def make_dataset(digit_num):
   dataset = []
@@ -45,7 +45,7 @@ def normalize_datasets(all_datasets):
 
       for image in number_datasets:
         # normalized_image = [ 2 * float(elem) / 255. - 1 for elem in image ]
-        normalized_image = [ float(elem) for elem in image ]
+        normalized_image = [ float(elem) for elem in inmage ]
         normalized_number_datasets.append(normalized_image)
 
       normalized_dict[key].append(normalized_number_datasets)
