@@ -315,7 +315,8 @@ if __name__ == '__main__':
   # classification_accuracy = get_classification_accuracy(x_validate, y_validate, opt_theta, num_layers)
   # print "validation accuracy: ", classification_accuracy
 
-  architectures = [(5), (100), (5,5), (100, 100)]
+  # architectures = [(5), (100), (5,5), (100, 100)]
+  architectures = [(5), (5,5), (5,5,5), (5,5,5,5), (5,5,5,5,5)]
   learning_rates = [100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001]
   training_rates = {}
   testing_rates = {}
