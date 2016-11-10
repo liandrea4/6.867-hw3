@@ -97,9 +97,7 @@ $$\theta \leftarrow \theta - \eta \frac{\delta l(y,F(x;\theta))}{\delta \theta}$
 With regularization, the update step now becomes:
 
 $\theta \leftarrow \theta - \eta \frac{\delta J}{\delta \theta}$ where $J(\theta) = L(\theta) + R(\theta)$ and $R(\theta) = \lambda *(\sum_{ij} w_{ij}^{(1)}^2 + \sum_{ij} w_{ij}^{(2)}^2)$. Furthermore, $J'(\theta) = L'(\theta) + R'(\theta)$. $L'(\theta)$ has already been calculated and $R'(\theta) = 2* \lambda * \sum_{ij} w_{ij}$
-=======
-This would impact the pseudocode because now we must also incorporate this additional regularization term when taking the gradient of the loss function. Since this gradient is used in the stochastic gradient descent update it ultimately impacts the entire algorithm.
->>>>>>> 19bccd1f93e56c5a76074bc3d45db80909a1b5a3
+
 
 \subsection{Binary classification}
 We test our implementation on the 2D datasets provided in HW2. The accuracies for the training and testing data sets are presented for different architectures of the neural network in Tables 1 and 2. It is important to note that the accuracies varied significantly between multiple runs of the algorithm. This is because of the randomly initialized weights, so the accuracies presented are some examples of the results of our algorithm, but may reflect slight variation due to the random initializaation.
@@ -139,15 +137,22 @@ We test our implementation on the 2D datasets provided in HW2. The accuracies fo
 
 
 \section{Convolutional Neural Networks}
-In this section, we explore various versions of the dual form of support vector machines, first with slack variables and then with generalized kernel functions.
+In this section, we explore the application of convolutional neural networks in performing image classification.
 
 \subsection{Convolutional filter receptive field}
+The dimensions of the receptive field for a node in $Z_2$ is $7 x 7$. With this in mind, we see that it is effective to build convolutional networks deeper in order to increase the receptive fields for subsequent nodes. This is effective because it allows the network to learn additional features that take into account larger and larger amounts of the original image's pixels.
 
 \subsection{Run the Tensorflow conv net}
+In the "define\_tensorflor\_graph" graph function we see that there could be a maximum of 6 layers and a minimum of 4 layers. Only 2 of the layers are convolutional. 2 other ones are regular hidden ones and the 2 optional ones are pooling layers. The relu activation function is used on the hidden nodes. The softmax loss function with cross entropy is being used to train the network. The loss is being minimized with gradient descent. When the convolutional network is run, we get a batch training accuracy of 100\% and a validation accuracy of 63.2\%. What this means is that the network is classifying extremely well on the training data, while not so well on the validation datasets, which points towards overfitting.
 
 \subsection{Add pooling layers}
+By adding pooling layers to our convolutional network, our results definitely changed. Specifically, we used a layer 1 pool filter size of 5, a layer 1 pool stride of 2, a layer 2 pool filter size of 2, and a layer 2 pool stride size of 2. After the 1500th step, this achieved a batch training accuracy of 100\% and a validation accuracy of 69\%. Interestingly enough, after the 1400th step, the training accuracy was 70\% and the validation accuracy was also 70\%. With these results it appears that max pooling marginally reduces the training accuracy while improving the validation accuracy. In a sense, it almost serves as a form of regularization that is able to prevent overfitting because now instead of the final layer processing information from all the original pixels the pooling allows clusters of pixels to be expressed as one value which enables better generalization.
 
 \subsection{Regularize your network!}
+\subsubsection{Dropout}
+\subsubsection{Weight regularization}
+\subsubsection{Data augmentation}
+\subsubsection{Early stopping}
 
 \subsection{Experiment with your architecture}
 
